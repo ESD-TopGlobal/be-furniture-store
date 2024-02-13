@@ -1,0 +1,11 @@
+[
+    {
+        "id": 1,
+        "name": "John Doe",
+        "desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, molestie ipsum et, consequat nibh. Etiam non elit dui. Nullam vel eros sit amet arcu vestibulum accumsan in in leo.",
+        "price": 100,
+        "category": "Desk",
+        "image": "https://via.placeholder.com/150",
+        "stock": 10
+    }
+]
