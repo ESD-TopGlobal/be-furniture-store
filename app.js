@@ -76,7 +76,7 @@ app.get('/products/:id', (req, res) => {
     }
 
     const products = readData(PRODUCT_PATH)
-    const product = products.find(product => product.id === productId)
+    const product = products.find(product => product.id === parseInt(productId))
     if (!product) {
         res.status(404).json(new Response(false, `Product with id ${productId} not found`, null))
         return
