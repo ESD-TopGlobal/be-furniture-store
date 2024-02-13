@@ -6,6 +6,24 @@
         "category": "Meja Makan",
         "price": 1749000,
         "stock": 50,
-        "image": "/images/1707810053425-Heim Studio HAKI Meja Makan 160.png"
+        "image": "/images/1707815867839-Heim-Studio-HAKI-Meja-Makan-160.png"
+    },
+    {
+        "id": 2,
+        "name": "Heim Studio BORDO Sofa 2 Seater",
+        "desc": "Bordo Sofa 2 Seater adalah pilihan yang tepat bagi Anda yang mencari kursi sofa minimalis dan murah untuk ruang tamu atau keluarga Anda. Dengan ukuran 2 seater, sofa ini menawarkan kenyamanan dan gaya yang tak tertandingi.  ",
+        "category": "Sofa",
+        "price": 3469000,
+        "stock": 20,
+        "image": "/images/1707816445398-Heim-Studio-BORDO-Sofa-2-Seater.png"
+    },
+    {
+        "id": 3,
+        "name": "YUZU Sofa 2 Dudukan",
+        "desc": "Yuzu Sofa 2 Dudukan merupakan produk sofa minimalis yang memberikan kenyaman dan keempukan dengan desain Japandi. Produk ini menjadi pilihan yang tepat untuk Anda yang sedang mencari sofa minimalis murah dengan keempukan dudukan soft yang nyaman.",
+        "category": "Sofa",
+        "price": 2229000,
+        "stock": 20,
+        "image": "/images/1707816143676-YUZU-Sofa-2-Dudukan.png"
     }
 ]

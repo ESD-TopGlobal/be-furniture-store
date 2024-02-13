@@ -25,8 +25,19 @@ function saveImage(image, filename) {
     image.mv(path.join(__dirname, '../public/images', filename))
 }
 
+function deleteImage(filename) {
+    const filepath = path.join(__dirname, '../public/images', filename)
+    if (fs.existsSync(filepath)) {
+        fs.unlinkSync(filepath)
+    }
+}
+
 function getLastId(data) {
     return data.length === 0 ? 0 : data[data.length - 1].id
 }
 
-module.exports = { readData, writeData, saveImage, getLastId }
+function removeSpace(str) {
+    return str.replace(/\s/g, '-')
+}
+
+module.exports = { readData, writeData, saveImage, deleteImage, getLastId, removeSpace }

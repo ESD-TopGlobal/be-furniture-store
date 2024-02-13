@@ -24,4 +24,13 @@ function validateProduct(method, data) {
     return schema.validate(data)
 }
 
-module.exports = { validateProduct }
+function validateCart(data) {
+    const schema = joi.object({
+        productId: joi.string().required(),
+        quantity: joi.number().required()
+    })
+
+    return schema.validate(data)
+}
+
+module.exports = { validateProduct, validateCart }
