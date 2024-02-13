@@ -1,8 +1,10 @@
 const express = require('express')
-const joi = require('joi')
-const fs = require('fs')
 const cors = require('cors')
 const path = require('path')
+const fileUpload = require('express-fileupload')
+
+const { readData, writeData, saveImage, getLastId } = require('./utils/accessData')
+const { validateProduct } = require('./utils/validation')
 
 const PORT = 3000
 
@@ -12,26 +14,10 @@ app.use(cors())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+app.use(fileUpload())
 
 const productDataPath = './data/products.json'
 const orderDataPath = './data/orders.json'
-
-const productSchema = joi.object({
-    name: joi.string().required(),
-    desc: joi.string().required(),
-    category: joi.string().required(),
-    price: joi.number().required(),
-    stock: joi.number().required(),
-    image: joi.string().required()
-})
-
-function readData(filepath) {
-    return JSON.parse(fs.readFileSync(filepath, 'utf-8'))
-}
-
-function writeData(filepath, data) {
-    fs.writeFileSync(filepath, JSON.stringify(data, null, 4))
-}
 
 class Response {
     constructor(success, message, data) {
@@ -71,21 +57,37 @@ app.get('/products/:id', (req, res) => {
 app.get('/search/products', (req, res) => {
     const name = req.query.name
     const products = readData(productDataPath)
-    const results = products.filter(product => product.name.includes(name))
+    const results = products.filter(product => {
+        return product.name.toLowerCase().includes(name.toLowerCase())
+    })
     res.status(200).json(new Response(true, `Search product by name ${name}`, results))
 })
 
 // POST /products: Menambahkan produk baru
 app.post('/products', (req, res) => {
-    const { error, value } = productSchema.validate(req.body)
+    const { error, value } = validateProduct('POST', req.body)
+
     if (error) {
         res.status(400).json(new Response(false, error.details[0].message, null))
     } else {
+        const image = req.files.image
+        const extension = path.extname(image.name)
+        if (extension !== '.jpg' && extension !== '.png') {
+            res.status(400).json(new Response(false, 'Image must be jpg or png', null))
+            return
+        }
+        const imageName = `${Date.now()}-${value.name}${extension}`
+        value.image = `/images/${imageName}`
+
         const products = readData(productDataPath)
-        const newProduct = { id: products.length + 1, ...value }
+        const lastId = getLastId(products)
+        const newProduct = { id: lastId + 1, ...value }
         products.push(newProduct)
+
+        saveImage(image, imageName)
         writeData(productDataPath, products)
-        res.status(201).json(new Response(true, 'Add new product', newProduct))
+
+        res.status(201).json(new Response(true, 'Add new product success', null))
     }
 })
 
@@ -94,13 +96,39 @@ app.post('/products', (req, res) => {
 // PUT /products/{id}: Memperbarui produk berdasarkan ID
 app.put('/products/:id', (req, res) => {
     const productId = req.params.id
-
+    
     const products = readData(productDataPath)
-    const index = products.findIndex(product => product.id === productId)
+    const index = products.findIndex(product => product.id === parseInt(productId))
+    
     if (index !== -1) {
-        products[index] = { id: productId, ...value }
+        const { error, value } = validateProduct('PUT', req.body)
+
+        if (error) {
+            return res.status(400).json(new Response(false, error.details[0].message, null))
+        }
+
+        const oldProduct = products[index]
+        const newProduct = { ...oldProduct, ...value }
+
+        products[index] = newProduct
+
+        if (req.files && req.files.image) {
+            const image = req.files.image
+            const extension = path.extname(image.name)
+            if (extension !== '.jpg' && extension !== '.png') {
+                res.status(400).json(new Response(false, 'Image must be jpg or png', null))
+                return
+            }
+            const imageName = `${Date.now()}-${value.name}${extension}`
+
+            saveImage(image, imageName)
+
+            value.image = `/images/${imageName}`
+        }
+
         writeData(productDataPath, products)
-        res.status(200).json(new Response(true, 'Update product by id', products[index]))
+
+        res.status(200).json(new Response(true, 'Update product success', null))
     } else {
         res.status(404).json(new Response(false, `Product with id ${productId} not found`, null))
     }
@@ -114,7 +142,7 @@ app.delete('/products/:id', (req, res) => {
     if (index !== -1) {
         products.splice(index, 1)
         writeData(productDataPath, products)
-        res.status(200).json(new Response(true, `Delete product by id ${productId}`, null))
+        res.status(200).json(new Response(true, `Product with id ${productId} deleted`, null))
     } else {
         res.status(404).json(new Response(false, `Product with id ${productId} not found`, null))
     }
@@ -123,13 +151,12 @@ app.delete('/products/:id', (req, res) => {
 
 // TODO: API for order management
 // User role
-// POST /checkout: Membuat pesanan baru.
-// GET /orders: Mendapatkan daftar semua pesanan.
-// GET /orders/{id}: Mendapatkan detail pesanan berdasarkan ID.
-// PUT /orders/{id}: Memperbarui status pesanan (misalnya: diproses, dikirim, selesai).
-// DELETE /orders/{id}: Membatalkan pesanan berdasarkan ID.
+// POST /checkout: Membuat pesanan baru
+// GET /orders: Mendapatkan daftar semua pesanan
+// GET /orders/{id}: Mendapatkan detail pesanan berdasarkan ID
+// PUT /orders/{id}: Memperbarui status pesanan (misalnya: diproses, dikirim, selesai)
+// DELETE /orders/{id}: Membatalkan pesanan berdasarkan ID
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
 })
-

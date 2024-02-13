@@ -1,11 +1,11 @@
 [
     {
         "id": 1,
-        "name": "John Doe",
-        "desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, molestie ipsum et, consequat nibh. Etiam non elit dui. Nullam vel eros sit amet arcu vestibulum accumsan in in leo.",
-        "price": 100,
-        "category": "Desk",
-        "image": "https://via.placeholder.com/150",
-        "stock": 10
+        "name": "Heim Studio HAKI Meja Makan 160",
+        "desc": "Haki Meja Makan 160 merupakan salah satu produk meja makan minimalis dengan desain Japandi Natural yang Elegan dan Fungsional. Meja makan ini memiliki model yang sangat menarik yang terbuat dari bahan Particle Board yang berkualitas, sehingga mampu memberikan tampilan yang menarik dan awet untuk ruang makan Anda. ",
+        "category": "Meja Makan",
+        "price": 1749000,
+        "stock": 50,
+        "image": "/images/1707810053425-Heim Studio HAKI Meja Makan 160.png"
     }
 ]
