@@ -24,11 +24,21 @@ function validateProduct(method, data) {
     return schema.validate(data)
 }
 
-function validateCart(data) {
-    const schema = joi.object({
-        productId: joi.string().required(),
-        quantity: joi.number().required()
-    })
+function validateCart(method, data) {
+    let schema = null
+
+    if (method === 'POST') {
+        schema = joi.object({
+            productId: joi.number().required(),
+            quantity: joi.number().required(),
+            notes: joi.string()
+        })
+    } else if (method === 'PUT') {
+        schema = joi.object({
+            quantity: joi.number(),
+            notes: joi.string()
+        })
+    }
 
     return schema.validate(data)
 }

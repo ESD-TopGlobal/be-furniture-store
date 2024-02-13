@@ -4,7 +4,7 @@ const path = require('path')
 const fileUpload = require('express-fileupload')
 
 const { readData, writeData, saveImage, deleteImage, getLastId, removeSpace } = require('./utils/accessData')
-const { validateProduct } = require('./utils/validation')
+const { validateProduct, validateCart } = require('./utils/validation')
 
 const PORT = 3010
 
@@ -40,11 +40,12 @@ class Product {
 }
 
 class Cart {
-    constructor(id, productId, quantity, totalPrice) {
+    constructor(id, productId, quantity, totalPrice, notes) {
         this.id = id
         this.productId = productId
         this.quantity = quantity
         this.totalPrice = totalPrice
+        this.notes = notes || ''
     }
 }
 
@@ -69,6 +70,11 @@ app.get('/products', (req, res) => {
 // GET /products/{id}: Mendapatkan detail produk berdasarkan ID
 app.get('/products/:id', (req, res) => {
     const productId = req.params.id
+    if (isNaN(productId)) {
+        res.status(400).json(new Response(false, 'Product id must be a number', null))
+        return
+    }
+
     const products = readData(PRODUCT_PATH)
     const product = products.find(product => product.id === productId)
     if (!product) {
@@ -82,6 +88,11 @@ app.get('/products/:id', (req, res) => {
 // GET /search/products?name={name}: Mencari produk berdasarkan nama
 app.get('/search/products', (req, res) => {
     const name = req.query.name
+    if (!name) {
+        res.status(400).json(new Response(false, 'Name query parameter is required', null))
+        return
+    }
+
     const products = readData(PRODUCT_PATH)
     const results = products.filter(product => {
         return product.name.toLowerCase().includes(name.toLowerCase())
@@ -133,6 +144,10 @@ app.post('/products', (req, res) => {
 // PUT /products/{id}: Memperbarui produk berdasarkan ID
 app.put('/products/:id', (req, res) => {
     const productId = req.params.id
+    if (isNaN(productId)) {
+        res.status(400).json(new Response(false, 'Product id must be a number', null))
+        return
+    }
 
     const products = readData(PRODUCT_PATH)
     const index = products.findIndex(product => product.id === parseInt(productId))
@@ -188,10 +203,14 @@ app.put('/products/:id', (req, res) => {
 // DELETE /products/{id}: Menghapus produk berdasarkan ID
 app.delete('/products/:id', (req, res) => {
     const productId = req.params.id
+    if (isNaN(productId)) {
+        res.status(400).json(new Response(false, 'Product id must be a number', null))
+        return
+    }
 
     const products = readData(PRODUCT_PATH)
 
-    const index = products.findIndex(product => product.id === productId)
+    const index = products.findIndex(product => product.id === parseInt(productId))
 
     if (index !== -1) {
         products.splice(index, 1)
@@ -207,16 +226,26 @@ app.delete('/products/:id', (req, res) => {
 
 // POST /carts: Menambahkan produk ke keranjang
 app.post('/carts', (req, res) => {
-    const { productId, quantity } = req.body
-    const products = readData(PRODUCT_PATH)
-
-    const product = products.find(product => product.id === parseInt(productId))
-    if (!product) {
-        res.status(404).json(new Response(false, `Product with id ${productId} not found`, null))
+    const { error, value } = validateCart('POST', req.body)
+    if (error) {
+        res.status(400).json(new Response(false, error.details[0].message, null))
         return
     }
 
-    if (product.stock < quantity) {
+    if (value.quantity <= 0) {
+        res.status(400).json(new Response(false, 'Quantity must be greater than 0', null))
+        return
+    }
+
+    const products = readData(PRODUCT_PATH)
+
+    const product = products.find(product => product.id === parseInt(value.productId))
+    if (!product) {
+        res.status(404).json(new Response(false, `Product with id ${value.productId} not found`, null))
+        return
+    }
+
+    if (product.stock < value.quantity) {
         res.status(400).json(new Response(false, 'Stock not enough', null))
         return
     }
@@ -224,8 +253,8 @@ app.post('/carts', (req, res) => {
     const carts = readData(CART_PATH)
     const lastId = getLastId(carts)
 
-    const totalPrice = product.price * quantity
-    const newCart = new Cart(lastId + 1, productId, quantity, totalPrice)
+    const totalPrice = product.price * value.quantity
+    const newCart = new Cart(lastId + 1, value.productId, value.quantity, totalPrice, value.notes)
     carts.push(newCart)
 
     writeData(CART_PATH, carts)
@@ -236,7 +265,7 @@ app.post('/carts', (req, res) => {
 // GET /carts: Mendapatkan daftar produk di keranjang
 app.get('/carts', (req, res) => {
     const carts = readData(CART_PATH)
-    if (carts.length === 0) { 
+    if (carts.length === 0) {
         res.status(404).json(new Response(false, 'No products in cart', null))
         return
     }
@@ -253,9 +282,13 @@ app.get('/carts', (req, res) => {
 // GET /carts/{id}: Mendapatkan detail pesanan di keranjang
 app.get('/carts/:id', (req, res) => {
     const cartId = req.params.id
+    if (isNaN(cartId)) {
+        res.status(400).json(new Response(false, 'Cart id must be a number', null))
+        return
+    }
 
     const carts = readData(CART_PATH)
-    const cart = carts.find(cart => cart.id === cartId)
+    const cart = carts.find(cart => cart.id === parseInt(cartId))
     if (!cart) {
         res.status(404).json(new Response(false, `Cart with id ${cartId} not found`, null))
         return
@@ -276,40 +309,54 @@ app.get('/carts/:id', (req, res) => {
 // PUT /carts/{id}: Memperbarui detail pesanan di keranjang
 app.put('/carts/:id', (req, res) => {
     const cartId = req.params.id
-    const { quantity } = req.body
+    if (isNaN(cartId)) {
+        res.status(400).json(new Response(false, 'Cart id must be a number', null))
+        return
+    }
+
+    const { error, value } = validateCart('PUT', req.body)
+    if (error) {
+        res.status(400).json(new Response(false, error.details[0].message, null))
+        return
+    }
 
     const carts = readData(CART_PATH)
-    const index = carts.findIndex(cart => cart.id === cartId)
+    const index = carts.findIndex(cart => cart.id === parseInt(cartId))
 
-    if (index !== -1) {
-        const cart = carts[index]
-        const products = readData(PRODUCT_PATH)
-        const product = products.find(product => product.id === cart.productId)
-
-        if (product.stock < quantity) {
-            res.status(400).json(new Response(false, 'Stock not enough', null))
-            return
-        }
-
-        const totalPrice = product.price * quantity
-        const newCart = new Cart(cart.id, cart.productId, quantity, totalPrice)
-        carts[index] = newCart
-
-        writeData(CART_PATH, carts)
-
-        res.status(200).json(new Response(true, 'Update cart success', null))
-    } else {
+    if (index === -1) {
         res.status(404).json(new Response(false, `Cart with id ${cartId} not found`, null))
     }
+
+    const cart = carts[index]
+    const products = readData(PRODUCT_PATH)
+    const product = products.find(product => product.id === cart.productId)
+
+    if (product.stock < value.quantity) {
+        res.status(400).json(new Response(false, 'Stock not enough', null))
+        return
+    }
+
+    const totalPrice = product.price * value.quantity
+    const newCart = new Cart(cart.id, cart.productId, value.quantity, totalPrice, value.notes)
+    carts[index] = newCart
+
+    writeData(CART_PATH, carts)
+
+    res.status(200).json(new Response(true, 'Update cart success', null))
+
 })
 
 // DELETE /carts/{id}: Menghapus produk di keranjang
 app.delete('/carts/:id', (req, res) => {
     const cartId = req.params.id
+    if (isNaN(cartId)) {
+        res.status(400).json(new Response(false, 'Cart id must be a number', null))
+        return
+    }
 
     const carts = readData(CART_PATH)
 
-    const index = carts.findIndex(cart => cart.id === cartId)
+    const index = carts.findIndex(cart => cart.id === parseInt(cartId))
 
     if (index !== -1) {
         carts.splice(index, 1)

@@ -1,8 +1,23 @@
 [
     {
         "id": 1,
+        "productId": 2,
+        "quantity": 10,
+        "totalPrice": 34690000,
+        "notes": ""
+    },
+    {
+        "id": 2,
+        "productId": 3,
+        "quantity": 2,
+        "totalPrice": 4458000,
+        "notes": ""
+    },
+    {
+        "id": 3,
         "productId": 1,
         "quantity": 2,
-        "totalPrice": 3498000
+        "totalPrice": 3498000,
+        "notes": "Carikan barang yang bagus"
     }
 ]
