@@ -222,7 +222,7 @@ app.delete('/products/:id', (req, res) => {
 })
 
 
-// API for cart and order management
+// API for cart management
 
 // POST /carts: Menambahkan produk ke keranjang
 app.post('/carts', (req, res) => {
