@@ -4,12 +4,21 @@ const AppResponse = require('../helpers/response')
 
 exports.getAllProducts = async (req, res) => {
 
-    const result = await productService.getAllProducts();
+    const result = await productService.getAllProducts(req, res);
 
-    return res.status(result.status).json(result);
+    return new AppResponse().success('Success get all products', result).send(res);
 }
 
-exports.getProductById = async (req, res) => {
+exports.getDetailProduct = async (req, res) => {
+    const result = await productService.getDetailProduct(req, res);
+
+    return new AppResponse().success('Success get detail product', result).send(res);
+}
+
+exports.searchProduct = async (req, res) => {
+    const result = await productService.searchProduct(req, res);
+
+    return new AppResponse().success('Success search product', result).send(res);
 }
 
 exports.createProduct = async (req, res) => {
