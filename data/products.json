@@ -25,5 +25,23 @@
         "price": 2229000,
         "stock": 20,
         "image": "/images/1707816143676-YUZU-Sofa-2-Dudukan.png"
+    },
+    {
+        "id": 4,
+        "name": "Meja Makan Keluarga + Kursi",
+        "desc": "meja makan yang dilengkapi dengan kursi, dan memiliki desgin minimalis. Tidak memakan tempat dan cocok untuk semua kalangan",
+        "category": "MEJA & KURSI",
+        "price": 1100000,
+        "stock": 29,
+        "image": "/images/1707932642029-Meja-Makan-Keluarga-+-Kursi.jpg"
+    },
+    {
+        "id": 5,
+        "name": "Kasur Tidur Anti Pegal",
+        "desc": "kasur yang menghadirkan kualitas tidur terbaik bagi Anda. Dirancang dengan cermat dan menggunakan bahan-bahan terbaik, kasur ini akan membawa kenyamanan istirahat Anda ke tingkat yang baru.",
+        "category": "KASUR",
+        "price": 2000000,
+        "stock": 10,
+        "image": "/images/1707932879373-Kasur-Tidur-Anti-Pegal.jpg"
     }
 ]

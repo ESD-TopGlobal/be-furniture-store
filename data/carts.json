@@ -19,5 +19,12 @@
         "quantity": 2,
         "totalPrice": 3498000,
         "notes": "Carikan barang yang bagus"
+    },
+    {
+        "id": 4,
+        "productId": 3,
+        "quantity": 1,
+        "totalPrice": 2229000,
+        "notes": "coba 1"
     }
 ]
