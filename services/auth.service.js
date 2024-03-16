@@ -39,17 +39,31 @@ exports.authLogin = async (req, res) => {
 }
 
 exports.authRegister = async (req, res) => {
-    const { name, email, password } = req.body
+    try {
+        const { name, email, password } = req.body
 
-    const hashPassword = await bcrypt.hash(password, 10)
-    if (!hashPassword) {
-        return response.error('Failed to hash password', null, 500).send(res)
+        const hashPassword = await bcrypt.hash(password, 10)
+        if (!hashPassword) {
+            return response.error('Failed to hash password', null, 500).send(res)
+        }
+
+        // check if user exists
+        const isUserExists = await User.findOne({
+            where: {
+                email: email
+            }
+        })
+        if (isUserExists) {
+            return response.error('Email already exists', null, 400).send(res)
+        }
+
+        const data = await User.create({ name, email, password: hashPassword })
+        if (!data) {
+            return response.error('Failed register', null, 500).send(res)
+        }
+
+        return response.success('Success register', data.name, 201).send(res)
+    } catch (error) {
+        return response.error(error.message, null, 500).send(res)
     }
-
-    const data = await User.create({ name, email, password: hashPassword })
-    if (!data) {
-        return response.error('Failed register', null, 500).send(res)
-    }
-
-    return response.success('Success register', data, 201).send(res)
 }

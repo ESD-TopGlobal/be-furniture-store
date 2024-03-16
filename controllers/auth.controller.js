@@ -12,7 +12,7 @@ exports.authLogin = async (req, res, next) => {
         return response.error(error.details[0].message, null).send(res)
     }
 
-    const result = await authService.authLogin(req)
+    const result = await authService.authLogin(req, res)
     return result
 }
 
@@ -22,6 +22,6 @@ exports.authRegister = async (req, res) => {
         return response.error(error.details[0].message, null).send(res)
     }
 
-    const result = await authService.authRegister(req)
+    const result = await authService.authRegister(req, res)
     return result
 }
