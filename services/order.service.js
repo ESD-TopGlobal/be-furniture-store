@@ -1,5 +1,5 @@
 const AppResponse = require('../helpers/response')
-const { User, Order } = require('../models')
+const { User, Order, OrderProduct } = require('../models')
 
 const response = new AppResponse()
 
@@ -7,7 +7,7 @@ exports.getDetailOrder = async (req, res) => { }
 
 exports.createOrder = async (req, res) => {
     try {
-        const { userId, status, notes } = req.body
+        const { userId, status, notes, products } = req.body
 
         // find user by id
         const userData = await User.findByPk(userId)
@@ -16,14 +16,27 @@ exports.createOrder = async (req, res) => {
         }
 
         // create order
-        const order = await Order.create({
+        const orderData = await Order.create({
             userId,
             status,
             notes,
             createdAt: new Date(),
         })
 
-        return response.success('Order created', order).send(res)
+        // add products to table relation
+        const productData = products.map(() => {
+            return {
+                orderId: orderData.id,
+                productId: products.productId,
+                quantity: products.quantity,
+                totalPrice: products.quantity * products.price,
+                createdAt: new Date(),
+            }
+        })
+
+        await OrderProduct.bulkCreate(productData)
+
+        return response.success('Order created', orderData).send(res)
 
     } catch (error) {
         return response.error(error.message, null, 400).send(res)
