@@ -19,4 +19,12 @@ function validateEditCart(data) {
     return schema.validate(data)
 }
 
-module.exports = { validateAddCart, validateEditCart }
+function validateIdCart(data) {
+    schema = joi.object({
+        id: joi.number().required()
+    })
+
+    return schema.validate(data)
+}
+
+module.exports = { validateAddCart, validateEditCart, validateIdCart }

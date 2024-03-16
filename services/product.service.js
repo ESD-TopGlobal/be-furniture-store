@@ -1,7 +1,7 @@
 const { Product } = require('../models')
 const AppResponse = require('../helpers/response')
 const { Op } = require('sequelize')
-const { validateAddProduct, validateEditProduct, validateIdProduct } = require('../validations/product.validation')
+
 const { imageValidation } = require('../validations/image.validation')
 const { saveImage } = require('../helpers/image')
 
@@ -45,12 +45,6 @@ exports.searchProduct = async (req, res) => {
 }
 
 exports.createProduct = async (req, res) => {
-    const { error, value } = validateAddProduct(req.body)
-
-    if (error) {
-        return response.error(error.details[0].message, null).send(res)
-    }
-
     const image = imageValidation(req)
     if (!image.success) {
         return response.error(imageName.message, null).send(res)
@@ -58,24 +52,13 @@ exports.createProduct = async (req, res) => {
 
     saveImage(image.file, image.filename)
 
-    value.image = `/images/${image.filename}`
-    const data = await Product.create(value)
+    req.body.image = `/images/${image.filename}`
+    const data = await Product.create(req.body)
 
     return response.success('Success create product', data, 201).send(res)
 }
 
 exports.updateProduct = async (req, res) => {
-    const { id } = req.params
-    const { errorId } = validateIdProduct({ id })
-    if (errorId) {
-        return response.error(error.details[0].message, null).send(res)
-    }
-
-    const { error } = validateEditProduct(req.body)
-    if (error) {
-        return response.error(error.details[0].message, null).send(res)
-    }
-
     // const image = imageValidation(req)
     // if (!image.success) {
     //     return response.error(imageName.message, null).send(res)
@@ -95,11 +78,6 @@ exports.updateProduct = async (req, res) => {
 }
 
 exports.deleteProduct = async (req, res) => {
-    const { id } = req.params
-    const { error } = validateIdProduct({ id })
-    if (error) {
-        return response.error(error.details[0].message, null).send(res)
-    }
 
     const data = await Product.destroy({
         where: {

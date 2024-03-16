@@ -36,6 +36,11 @@ exports.createProduct = async (req, res) => {
 }
 
 exports.updateProduct = async (req, res) => {
+    const { errorId } = validateIdProduct({ id: req.params.id })
+    if (errorId) {
+        return response.error(error.details[0].message, null).send(res)
+    }
+
     const { error } = validateEditProduct(req.body);
 
     if (error) {
@@ -48,6 +53,11 @@ exports.updateProduct = async (req, res) => {
 }
 
 exports.deleteProduct = async (req, res) => {
+    const { error } = validateIdProduct({ id: req.params.id })
+    if (error) {
+        return response.error(error.details[0].message, null).send(res)
+    }
+
     const result = await productService.deleteProduct(req, res);
 
     return result;
