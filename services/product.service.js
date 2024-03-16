@@ -45,23 +45,23 @@ exports.searchProduct = async (req, res) => {
 }
 
 exports.createProduct = async (req, res) => {
-    const image = imageValidation(req)
-    if (!image.success) {
-        return response.error(imageName.message, null).send(res)
+    const imageRes = imageValidation(req)
+    if (!imageRes.isSuccess) {
+        return imageRes
     }
 
-    saveImage(image.file, image.filename)
+    saveImage(imageRes.data.file, imageRes.data.filename)
 
-    req.body.image = `/images/${image.filename}`
+    req.body.image = `/images/${imageRes.data.filename}`
     const data = await Product.create(req.body)
 
     return response.success('Success create product', data, 201).send(res)
 }
 
 exports.updateProduct = async (req, res) => {
-    // const image = imageValidation(req)
-    // if (!image.success) {
-    //     return response.error(imageName.message, null).send(res)
+    // const imageRes = imageValidation(req)
+    // if (!imageRes.isSuccess) {
+    //     return imageRes
     // }
 
     const data = await Product.update(req.body, {
