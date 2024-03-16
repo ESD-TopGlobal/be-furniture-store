@@ -35,6 +35,8 @@ exports.authLogin = async (req, res) => {
         expiresIn: '24h'
     })
 
+    res.cookie('auth', token, { maxAge: 24 * 3600 * 1000 })
+
     return response.success('Login success', { token }, 201).send(res)
 }
 
@@ -65,5 +67,30 @@ exports.authRegister = async (req, res) => {
         return response.success('Success register', data.name, 201).send(res)
     } catch (error) {
         return response.error(error.message, null, 500).send(res)
+    }
+}
+
+exports.authRefreshToken = (res, user, token) => {
+    try {
+        const expireTime = jsonwebtoken.decode(token).exp
+        const remainingTime = expireTime - Date.now()
+
+        // if expire time less than 1 hour, create new token
+        let newToken = ""
+        if (remainingTime < 3600) {
+            newToken = jsonwebtoken.sign({
+                id: user.id,
+                email: user.email,
+                name: user.name,
+            }, process.env.JWT_SECRET, {
+                expiresIn: '24h'
+            })
+
+            res.cookie('auth', newToken, { maxAge: 24 * 3600 * 1000 })
+        }
+
+        return response.success("Success creating refresh token")
+    } catch (error) {
+        return response.error(error.message)
     }
 }
