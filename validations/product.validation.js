@@ -24,4 +24,12 @@ function validateEditProduct(data) {
     return schema.validate(data)
 }
 
-module.exports = { validateAddProduct, validateEditProduct }
+function validateIdProduct(data) {
+    schema = joi.object({
+        id: joi.number().required()
+    })
+
+    return schema.validate(data)
+}
+
+module.exports = { validateAddProduct, validateEditProduct, validateIdProduct }
