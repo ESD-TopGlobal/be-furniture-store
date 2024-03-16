@@ -9,6 +9,7 @@ const orderRoute = require('./order.route')
 router.get('/', (req, res) => {
     res.send('Welcome to Furniture Store API!')
 })
+
 router.use('/auth', authRoute)
 router.use('/carts', cartRoute)
 router.use('/products', productRoute)
