@@ -64,6 +64,8 @@ exports.updateProduct = async (req, res) => {
     //     return imageRes
     // }
 
+    const { id } = req.params
+
     const data = await Product.update(req.body, {
         where: {
             id: id
@@ -78,6 +80,7 @@ exports.updateProduct = async (req, res) => {
 }
 
 exports.deleteProduct = async (req, res) => {
+    const { id } = req.params
 
     const data = await Product.destroy({
         where: {

@@ -17,7 +17,7 @@ const imageValidation = (req) => {
     }
 
     const productName = removeSpace(req.body.name)
-    const filename = `${productName}-${Date.now()}${extension}`
+    const filename = `${Date.now()}-${productName}${extension}`
 
     return response.success('Success image validation', { file, filename })
 }

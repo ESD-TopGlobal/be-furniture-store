@@ -27,9 +27,16 @@ exports.getDetailCart = async (req, res) => {
 }
 
 exports.createCart = async (req, res) => {
-    const data = await Cart.create(req.body)
+    try {
+        const cart = req.body
+        cart.userId = req.user.id
 
-    return response.success('Success create cart', data, 201).send(res)
+        const data = await Cart.create(cart)
+
+        return response.success('Success create cart', data, 201).send(res)
+    } catch (error) {
+        return response.error(`Failed to create cart: ${error.message}`, null, 500).send(res)
+    }
 }
 
 exports.updateCart = async (req, res) => {
