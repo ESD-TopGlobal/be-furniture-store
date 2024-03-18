@@ -1,7 +1,7 @@
 const joi = require('joi')
 
 function validateAddCart(data) {
-    schema = joi.object({
+    const schema = joi.object({
         productId: joi.number().required(),
         quantity: joi.number().required(),
         notes: joi.string()
@@ -11,7 +11,7 @@ function validateAddCart(data) {
 }
 
 function validateEditCart(data) {
-    schema = joi.object({
+    const schema = joi.object({
         quantity: joi.number(),
         notes: joi.string()
     })
@@ -20,7 +20,7 @@ function validateEditCart(data) {
 }
 
 function validateIdCart(data) {
-    schema = joi.object({
+    const schema = joi.object({
         id: joi.number().required()
     })
 

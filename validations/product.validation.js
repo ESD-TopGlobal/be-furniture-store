@@ -1,7 +1,7 @@
 const joi = require('joi')
 
 function validateAddProduct(data) {
-    schema = joi.object({
+    const schema = joi.object({
         name: joi.string().required(),
         desc: joi.string().required(),
         category: joi.string().required(),
@@ -13,7 +13,7 @@ function validateAddProduct(data) {
 }
 
 function validateEditProduct(data) {
-    schema = joi.object({
+    const schema = joi.object({
         name: joi.string(),
         desc: joi.string(),
         category: joi.string(),
@@ -25,11 +25,19 @@ function validateEditProduct(data) {
 }
 
 function validateIdProduct(data) {
-    schema = joi.object({
+    const schema = joi.object({
         id: joi.number().required()
     })
 
     return schema.validate(data)
 }
 
-module.exports = { validateAddProduct, validateEditProduct, validateIdProduct }
+function validateSearchProduct(data) {
+    const schema = joi.object({
+        name: joi.string().required()
+    })
+
+    return schema.validate(data)
+}
+
+module.exports = { validateAddProduct, validateEditProduct, validateIdProduct, validateSearchProduct }

@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
 
 router.use('/auth', authRoute)
 router.use('/carts', authMiddleware, cartRoute)
-router.use('/products', authMiddleware, productRoute)
+router.use('/products', productRoute)
 router.use('/orders', authMiddleware, orderRoute)
 
 module.exports = router

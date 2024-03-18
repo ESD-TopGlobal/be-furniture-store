@@ -1,5 +1,5 @@
 const productService = require('../services/product.service');
-const { validateAddProduct, validateEditProduct } = require('../validations/product.validation')
+const { validateAddProduct, validateEditProduct, validateSearchProduct, validateIdProduct } = require('../validations/product.validation')
 const AppResponse = require('../helpers/response')
 
 const response = new AppResponse();
@@ -18,6 +18,11 @@ exports.getDetailProduct = async (req, res) => {
 }
 
 exports.searchProduct = async (req, res) => {
+    const { error } = validateSearchProduct(req.query)
+    if (error) {
+        return response.error(error.details[0].message).send(res)
+    }
+
     const result = await productService.searchProduct(req, res);
 
     return result;
