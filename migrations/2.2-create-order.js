@@ -5,14 +5,23 @@ module.exports = {
     await queryInterface.createTable('Orders', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID, // Use Sequelize.UUID instead of Sequelize.UUIDV4
+        defaultValue: Sequelize.UUIDV4 // Set a default value to generate UUID v4
       },
       userId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Users',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      paymentTypeId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'PaymentTypes',
           key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -34,7 +43,7 @@ module.exports = {
       }
     });
 
-    await queryInterface.addIndex('Orders', ['userId'])
+    // await queryInterface.addIndex('Orders', ['userId'])
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Orders');

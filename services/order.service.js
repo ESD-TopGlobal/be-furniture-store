@@ -1,5 +1,7 @@
+const { v4: uuidv4 } = require('uuid');
+const midtransCoreApi = require('../helpers/midtrans')
 const AppResponse = require('../helpers/response')
-const { User, Order, OrderProduct } = require('../models')
+const { User, Order, Product, Order_Product, PaymentType } = require('../models')
 
 const response = new AppResponse()
 
@@ -34,7 +36,13 @@ exports.getDetailOrder = async (req, res) => {
 
 exports.createOrder = async (req, res) => {
     try {
-        const { userId, status, notes, products } = req.body
+        const { status, notes, paymentType, products } = req.body
+
+        // get user id from token
+        const userId = req.user.id
+        if (!userId) {
+            return response.error('User not found', null, 404).send(res)
+        }
 
         // find user by id
         const userData = await User.findByPk(userId)
@@ -42,31 +50,88 @@ exports.createOrder = async (req, res) => {
             return response.error('User not found', null, 404).send(res)
         }
 
+        // generate uuidv4 for order id
+        const orderId = uuidv4()
+        let productData = []
+        let priceTotal = 0
+
+        // add products to table relation
+        const productBulkInsert = await Promise.all(products.map(async (product) => {
+            const isProductExist = await Product.findByPk(product.productId)
+
+            if (!isProductExist) {
+                throw new Error(`Product with id ${product.productId} not found`)
+            }
+
+            const data = isProductExist.dataValues
+            productData.push({
+                id: data.id,
+                price: data.price,
+                quantity: product.quantity,
+                name: data.name
+            })
+
+            priceTotal += (product.quantity * isProductExist.dataValues.price)
+
+            return {
+                orderId: orderId,
+                productId: product.productId,
+                quantity: product.quantity,
+                createdAt: new Date(),
+            }
+        }))
+
+        const dataMidstrans = {
+            "payment_type": "bank_transfer",
+            "transaction_details": {
+                "order_id": orderId,
+                "gross_amount": priceTotal
+            },
+            "items_details": productData,
+            "bank_transfer": {
+                "bank": `${paymentType}`
+            },
+            "customer_details": {
+                "first_name": req.user.name,
+                "last_name": req.user.name,
+                "email": req.user.email,
+            }
+        }
+
+        const transactionToken = await midtransCoreApi.charge(dataMidstrans)
+
+        console.log(transactionToken);
+
         // create order
         const orderData = await Order.create({
+            orderId,
             userId,
+            paymentType,
+            priceTotal,
+            vaNumber: transactionToken.va_number[0].va_number,
             status,
             notes,
             createdAt: new Date(),
         })
 
-        // add products to table relation
-        const productData = products.map(() => {
-            return {
-                orderId: orderData.id,
-                productId: products.productId,
-                quantity: products.quantity,
-                totalPrice: products.quantity * products.price,
-                createdAt: new Date(),
-            }
-        })
-
-        await OrderProduct.bulkCreate(productData)
+        await Order_Product.bulkCreate(productBulkInsert)
 
         return response.success('Order created', orderData).send(res)
 
     } catch (error) {
+        console.error(error)
         return response.error(error.message, null, 400).send(res)
+    }
+}
+
+exports.getPaymentType = async (req, res) => {
+    try {
+        const paymentTypeData = await PaymentType.findAll({
+            attributes: ['id', 'bankCode', 'bankName']
+        })
+        return response.success('Success get payment type', paymentTypeData).send(res)
+    } catch (error) {
+        return response.error('Error getting payment type', null, 500).send(res)
     }
 }
 

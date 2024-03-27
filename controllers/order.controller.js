@@ -23,3 +23,10 @@ exports.createOrder = async (req, res) => {
     const result = await orderService.createOrder(req, res)
     return result
 }
+
+exports.getPaymentType = async (req, res) => {
+    
+    const result = await orderService.getPaymentType(req, res)
+    return result
+
+}

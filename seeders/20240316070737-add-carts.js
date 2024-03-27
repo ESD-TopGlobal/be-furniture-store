@@ -15,8 +15,8 @@ module.exports = {
 
     await queryInterface.bulkInsert('Carts', [
       {
-        "id": 1,
         "productId": 2,
+        "userId": 1,
         "quantity": 10,
         "totalPrice": 34690000,
         "notes": "",
@@ -24,8 +24,8 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        "id": 2,
         "productId": 3,
+        "userId": 2,
         "quantity": 2,
         "totalPrice": 4458000,
         "notes": "",
@@ -33,8 +33,8 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        "id": 3,
         "productId": 1,
+        "userId": 1,
         "quantity": 2,
         "totalPrice": 3498000,
         "notes": "Carikan barang yang bagus",
@@ -42,8 +42,8 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        "id": 4,
         "productId": 3,
+        "userId": 2,
         "quantity": 1,
         "totalPrice": 2229000,
         "notes": "coba 1",

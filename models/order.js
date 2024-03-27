@@ -2,6 +2,8 @@
 const {
   Model
 } = require('sequelize');
+const { v4: uuidv4 } = require('uuid');
+
 module.exports = (sequelize, DataTypes) => {
   class Order extends Model {
     /**
@@ -14,7 +16,16 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Order.init({
+    id: {
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: () => uuidv4(), // Use UUID v4 as default value
+    },
     userId: DataTypes.INTEGER,
+    paymentTypeId: DataTypes.INTEGER,
+    vaNumber: DataTypes.STRING,
+    priceTotal: DataTypes.INTEGER,
     status: DataTypes.STRING,
     notes: DataTypes.STRING,
   }, {
