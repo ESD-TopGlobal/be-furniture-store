@@ -36,7 +36,7 @@ exports.getDetailOrder = async (req, res) => {
 
 exports.createOrder = async (req, res) => {
     try {
-        const { status, notes, paymentType, products } = req.body
+        const { status, notes, bankPayment, products } = req.body
 
         // get user id from token
         const userId = req.user.id
@@ -71,7 +71,7 @@ exports.createOrder = async (req, res) => {
                 name: data.name
             })
 
-            priceTotal += (product.quantity * isProductExist.dataValues.price)
+            priceTotal = priceTotal + (product.quantity * isProductExist.dataValues.price)
 
             return {
                 orderId: orderId,
@@ -87,9 +87,9 @@ exports.createOrder = async (req, res) => {
                 "order_id": orderId,
                 "gross_amount": priceTotal
             },
-            "items_details": productData,
+            "item_details": productData,
             "bank_transfer": {
-                "bank": `${paymentType}`
+                "bank": `${bankPayment.bankName}`
             },
             "customer_details": {
                 "first_name": req.user.name,
@@ -100,17 +100,15 @@ exports.createOrder = async (req, res) => {
 
         const transactionToken = await midtransCoreApi.charge(dataMidstrans)
 
-        console.log(transactionToken);
-
         // create order
         const orderData = await Order.create({
-            orderId,
+            id: orderId,
             userId,
-            paymentType,
             priceTotal,
-            vaNumber: transactionToken.va_number[0].va_number,
-            status,
             notes,
+            bankPaymentId: bankPayment.id,
+            vaNumber: transactionToken.va_numbers[0].va_number,
+            status: transactionToken.transaction_status,
             createdAt: new Date(),
         })
 
@@ -124,7 +122,7 @@ exports.createOrder = async (req, res) => {
     }
 }
 
-exports.getPaymentType = async (req, res) => {
+exports.getBankPaymentName = async (req, res) => {
     try {
         const paymentTypeData = await PaymentType.findAll({
             attributes: ['id', 'bankCode', 'bankName']

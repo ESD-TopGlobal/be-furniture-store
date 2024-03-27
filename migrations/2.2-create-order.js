@@ -11,6 +11,7 @@ module.exports = {
       },
       userId: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         references: {
           model: 'Users',
           key: 'id'
@@ -18,17 +19,27 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      paymentTypeId: {
+      bankPaymentId: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         references: {
-          model: 'PaymentTypes',
+          model: 'BankPayments',
           key: 'id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
+      vaNumber: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      priceTotal: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
       status: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       notes: {
         type: Sequelize.STRING

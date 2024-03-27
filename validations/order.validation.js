@@ -2,7 +2,10 @@ const joi = require('joi')
 
 const validateAddOrder = (data) => {
     const schema = joi.object({
-        paymentType: joi.string().required(),
+        bankPayment: joi.object({
+            id: joi.number().required(),
+            bankName: joi.string().required(),
+        }),
         notes: joi.string(),
         status: joi.string().required(),
         products: joi.array().items(

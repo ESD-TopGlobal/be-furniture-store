@@ -18,3 +18,11 @@ exports.validateEditUser = (data) => {
 
     return schema.validate(data)
 }
+
+exports.validateIdUser = (data) => {
+    const schema = joi.object({
+        id: joi.number().required()
+    })
+
+    return schema.validate(data)
+}

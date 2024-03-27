@@ -24,9 +24,9 @@ exports.createOrder = async (req, res) => {
     return result
 }
 
-exports.getPaymentType = async (req, res) => {
+exports.getBankPaymentName = async (req, res) => {
     
-    const result = await orderService.getPaymentType(req, res)
+    const result = await orderService.getBankPaymentName(req, res)
     return result
 
 }

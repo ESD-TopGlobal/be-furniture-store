@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: () => uuidv4(), // Use UUID v4 as default value
     },
     userId: DataTypes.INTEGER,
-    paymentTypeId: DataTypes.INTEGER,
+    bankPaymentId: DataTypes.INTEGER,
     vaNumber: DataTypes.STRING,
     priceTotal: DataTypes.INTEGER,
     status: DataTypes.STRING,

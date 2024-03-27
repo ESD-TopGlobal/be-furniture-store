@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    return queryInterface.bulkInsert('PaymentTypes', [
+    return queryInterface.bulkInsert('BankPayments', [
       {
         bankName: 'bri',
         createdAt: new Date(),

@@ -1,4 +1,7 @@
 const midtransClient = require('midtrans-client')
+const dotenv = require('dotenv')
+
+dotenv.config()
 
 const midtransCoreApi = new midtransClient.CoreApi({
     isProduction: false,
