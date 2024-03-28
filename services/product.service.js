@@ -66,7 +66,12 @@ exports.updateProduct = async (req, res) => {
 
     const { id } = req.params
 
-    const data = await Product.update(req.body, {
+    let newProduct = {
+        updatedAt: new Date(),
+        ...req.body
+    }
+
+    const data = await Product.update(newProduct, {
         where: {
             id: id
         }

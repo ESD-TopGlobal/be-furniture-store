@@ -42,7 +42,12 @@ exports.createCart = async (req, res) => {
 exports.updateCart = async (req, res) => {
     const { id } = req.params
 
-    const data = await Cart.update(req.body, {
+    let newCart = {
+        updatedAt: new Date(),
+        ...req.body
+    }
+
+    const data = await Cart.update(newCart, {
         where: {
             id: id
         }

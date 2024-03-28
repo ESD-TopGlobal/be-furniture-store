@@ -14,7 +14,9 @@ exports.updateUser = async (req, res) => {
             return response.error('User not found', null, 404).send(res)
         }
 
-        let newUserData = {}
+        let newUserData = {
+            updatedAt: new Date()
+        }
         if (name) {
             newUserData.name = name
         }

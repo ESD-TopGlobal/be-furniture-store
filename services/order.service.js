@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const midtransCoreApi = require('../helpers/midtrans')
 const AppResponse = require('../helpers/response')
-const { User, Order, Product, Order_Product, PaymentType } = require('../models')
+const { User, Order, Product, Order_Product, BankPayment } = require('../models')
 
 const response = new AppResponse()
 
@@ -124,15 +124,68 @@ exports.createOrder = async (req, res) => {
 
 exports.getBankPaymentName = async (req, res) => {
     try {
-        const paymentTypeData = await PaymentType.findAll({
-            attributes: ['id', 'bankCode', 'bankName']
+        const data = await BankPayment.findAll({
+            attributes: ['id', 'bankName']
         })
-        return response.success('Success get payment type', paymentTypeData).send(res)
+        return response.success('Success get payment type', data).send(res)
     } catch (error) {
         return response.error('Error getting payment type', null, 500).send(res)
     }
 }
 
-exports.updateOrder = async (req, res) => { }
+exports.updateOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params
+        const { status, notes } = req.body
 
-exports.deleteOrder = async (req, res) => { }
+        // check if order id exist
+        const orderData = Order.findByPk(orderId)
+        if (!orderData) {
+            return response.error('Order not found', null, 404).send(res)
+        }
+
+        let newOrder = {
+            updatedAt: new Date()
+        }
+        if (status) {
+            newOrder.status = status
+        }
+        if (notes) {
+            newOrder.notes = notes
+        }
+
+        await Order.update(newOrder, {
+            where: {
+                id: orderId
+            }
+        })
+
+        return response.success('Order updated', null).send(res)
+
+    } catch (error) {
+        return response.error("Error updating order", null, 500).res(send)
+    }
+ }
+
+exports.deleteOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params
+
+        // check if order id exist
+        const orderData = Order.findByPk(orderId)
+        if (!orderData) {
+            return response.error('Order not found', null, 404).send(res)
+        }
+
+        await Order.destroy({
+            where: {
+                id: orderId
+            }
+        })
+
+        return response.success('Order deleted', null).send(res)
+
+    } catch (error) {
+        return response.error("Error deleting order", null, 500).res(send)
+    }
+ }

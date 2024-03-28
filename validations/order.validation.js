@@ -19,6 +19,15 @@ const validateAddOrder = (data) => {
     return schema.validate(data)
 }
 
+const validateUpdateOrder = (data) => {
+    const schema = joi.object({
+        notes: joi.string(),
+        status: joi.string()
+    })
+
+    return schema.validate(data)
+}
+
 const validateIdOrder = (data) => {
     const schema = joi.object({
         id: joi.number().required()
@@ -27,4 +36,4 @@ const validateIdOrder = (data) => {
     return schema.validate(data)
 }
 
-module.exports = { validateAddOrder, validateIdOrder }
+module.exports = { validateAddOrder, validateUpdateOrder, validateIdOrder }
